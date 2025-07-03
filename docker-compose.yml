@@ -1,0 +1,33 @@
+volumes:
+  configs:
+
+services:
+  init-secrets:
+    build: ./build
+    image: 1password-init-secrets:local
+    restart: on-failure
+    env_file: .env
+    volumes:
+      - ./configs:/configs-init:ro
+      - configs:/configs
+
+  alpine:
+    image: alpine:latest
+    volumes:
+      - configs:/configs:ro
+    entrypoint: |
+      sh -c '
+        set -e
+        echo "-- env --"
+        set -a && . /configs/1password-injected.env && set +a && env
+        for file in $(find /configs -type f); do
+          echo "====="
+          echo "-- $$file --"
+          cat "$$file"
+          echo
+        done
+        echo "====="
+      '
+    depends_on:
+      init-secrets:
+        condition: service_completed_successfully
