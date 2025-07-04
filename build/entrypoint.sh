@@ -48,7 +48,7 @@ fi
 mv /tmp/env_changed.txt /configs/1password-injected.env
 
 # LOOP OVER EACH /configs-init FILE AND INJECT VARIABLES AND STORE IN /configs
-if [ ! -d "/configs-init" ]; then
+if [ -d "/configs-init" ]; then
 	files_processed=0
 	for f in $(find /configs-init -type f 2>/dev/null); do
 		f_new="$(echo "$f" | sed -E 's|^(/configs)-init|\1|')"
